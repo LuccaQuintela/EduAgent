@@ -33,4 +33,5 @@ First, install anaconda and then once in the root diretory of the project, run t
 If you wish to run each of the agent's individually and take a look at their event logs with visualizations, 
 run the following terminal command, take the link it provides and paste it into your web browser. 
 Make sure your pwd is `EduAgent/agents/` before doing so.
+
 ``` adk web ```
