@@ -1,0 +1,20 @@
+name: eduagent
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - numpy>=1.24
+  - pandas
+  - python-dotenv
+  - ipykernel
+  - grpcio  # Used by ADK and MCP for communication
+  - pip:
+      - google-generativeai  # Google's Gemini/PaLM API access
+      - google-adk           # ADK core
+      - fastapi              # For building tools or interfaces
+      - uvicorn              # ASGI server for FastAPI
+      - pydantic             # Type validation for schemas
+      - tiktoken             # Tokenizer used by OpenAI tools
+      - litellm
