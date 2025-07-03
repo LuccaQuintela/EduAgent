@@ -1,1 +1,1 @@
- 
+from .agent import curriculum_agent 
