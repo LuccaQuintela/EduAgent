@@ -1,9 +1,11 @@
 from google.adk.runners import Runner
 from google.adk.agents import Agent
 from google.adk.sessions import InMemorySessionService
+from google.adk.sessions import BaseSessionService
 from google.genai import types
-from typing import Dict
+from typing import Dict, Optional
 import json
+import uuid
 
 from engine.dictionaries import UserData, UserState
 from agents import central_agent
@@ -21,11 +23,11 @@ class Engine:
         self.verbose = verbose
         self.app_name = "EduAgent"
         self.users = self._init_username_db()
+        self.session_service: Optional[BaseSessionService] = None
     
     # TODO: look into other types of session services
     async def start_class(self):
-        user_data = self._get_active_user()
-        user_id = user_data["user_id"]
+        user_id, user_data = self._get_active_user()
         session_id = user_data["session_id"]
         user_state = user_data["user_state"]
 
@@ -36,6 +38,7 @@ class Engine:
             session_id=session_id,
             state=user_state,
         )
+        self.session_service = session_service
         if self.verbose: 
             print(f"Session started for [{user_id}]\nSession ID: {session_id}\nState:\n{user_state}")
         
@@ -52,7 +55,7 @@ class Engine:
             verbose = self.verbose
         )
 
-        self._cleanup(user_id, session.state)
+        await self._cleanup(user_id, session_id)
 
 
     async def _call_agent_async(self, query: str, runner: Runner, user_id: str, session_id: str, verbose: bool = False) -> str:
@@ -81,13 +84,19 @@ class Engine:
         response = None
         while True: 
             user_input = input("Prompt:")
-            if user_input.lower().strip() == "exit" or response and response.lower().strip() == "exit":
+            if user_input.lower().strip() == "exit":
                 break
-            response = await self._call_agent_async(query=user_input,
-                                            runner=runner,
-                                            user_id=user_id,
-                                            session_id=session_id,
-                                            verbose=verbose)
+            await self._call_agent_async(query=user_input,
+                                         runner=runner,
+                                         user_id=user_id,
+                                         session_id=session_id,
+                                         verbose=verbose)
+            session = await self.session_service.get_session(app_name="EduAgent",
+                                                             user_id=user_id,
+                                                             session_id=session_id)
+            if session.state.get("user_wishes_to_exit", False):
+                break
+            
 
     def _init_username_db(self) -> Dict[str, UserData]:
         try:
@@ -100,14 +109,14 @@ class Engine:
     def _sign_user(self, username: str):
         self.users[username] = {
             "user_id": username,
-            "session_id": "session01",
+            "session_id": str(uuid.uuid4()),
             "user_state": {
                 "active_curriculum": False,
                 "topic": None,
             }
         }
 
-    def _get_active_user(self) -> UserData:
+    def _get_active_user(self) -> tuple[str, UserData]:
         while True:
             username = input("Enter username: ")
             user = self.users.get(username, None)
@@ -116,12 +125,21 @@ class Engine:
                 user_input = user_input.lower().strip()
                 if user_input == "yes" or user_input == 'y':
                     self._sign_user(username)
-                    return self.users[username]
+                    return username, self.users[username]
             else:
-                return user
+                return username, user
             
-    def _cleanup(self, user_id: str, session_state: Dict):
-        self.users[user_id] = session_state
+    async def _cleanup(self, user_id: str, session_id: str):
+        session = await self.session_service.get_session(app_name="EduAgent",
+                                                         user_id=user_id,
+                                                         session_id=session_id)
+        session.state["user_wishes_to_exit"] = False
+        self.users[user_id] = {
+            "user_id": user_id,
+            "session_id": session_id,
+            "user_state": session.state
+        }
+    
         try:
             with open(self.users_file_path, "w") as f:
                 json.dump(self.users, f)

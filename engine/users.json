@@ -1,1 +1,1 @@
-{"bob": {"user_id": "bob", "session_id": "session01", "user_state": {"active_curriculum": false, "topic": null}}}
+{"bob": {"user_id": "bob", "session_id": "f9cb0fff-392f-4852-9efe-a51372c9ad48", "user_state": {"active_curriculum": false, "topic": null, "user_wishes_to_exit": false}}, "penguin": {"user_id": "penguin", "session_id": "68b6c4b1-03b2-4e33-928a-974f606eb5c8", "user_state": {"active_curriculum": false, "topic": null}}}

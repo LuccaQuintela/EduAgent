@@ -1,6 +1,8 @@
 from google.adk.agents import Agent
 from agents.constants import MODEL_GEMINI_2_0_FLASH
 
+from agents.interaction_agent.individual_tools import *
+
 interaction_agent = None
 
 try:
@@ -21,9 +23,10 @@ try:
             "Throughout the conversation, provide helpful prompts and clarify next steps as needed. "
             "After each interaction, summarize any important information you have learned from the user and return this summary for use by other agents. "
             "Do not perform actions outside of user communication; delegate all other tasks to the appropriate agents. "
-            "If the user has nothing left they wish to do and they make it clear they wish to exit, simply return the word 'exit'. "
+            "If the user has nothing left they wish to do and they make it clear they wish to exit, say goodbye to the "
+            "user and then call the exit_conversation tool and simply return to the central agent. "
         ),
-        tools=[],
+        tools=[exit_conversation],
         sub_agents=[],
     )
 except Exception as e:
