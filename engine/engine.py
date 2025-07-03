@@ -3,6 +3,7 @@ from google.adk.agents import Agent
 from google.adk.sessions import InMemorySessionService
 from google.genai import types
 from typing import Dict
+import json
 
 from engine.dictionaries import UserData, UserState
 from agents import central_agent
@@ -16,10 +17,10 @@ class Engine:
         return cls._instance
     
     def __init__(self, verbose: bool = False):
-        self.users = self._init_username_db()
+        self.users_file_path = "engine/users.json"
         self.verbose = verbose
         self.app_name = "EduAgent"
-
+        self.users = self._init_username_db()
     
     # TODO: look into other types of session services
     async def start_class(self):
@@ -50,6 +51,8 @@ class Engine:
             session_id=session_id,
             verbose = self.verbose
         )
+
+        self._cleanup(user_id, session.state)
 
 
     async def _call_agent_async(self, query: str, runner: Runner, user_id: str, session_id: str, verbose: bool = False) -> str:
@@ -87,16 +90,12 @@ class Engine:
                                             verbose=verbose)
 
     def _init_username_db(self) -> Dict[str, UserData]:
-        return {
-            "bob": {
-                    "user_id": "bob",
-                    "session_id": "session01",
-                    "user_state": {
-                        "active_curriculum": False,
-                        "topic": None,
-                    }
-                }
-        }
+        try:
+            with open(self.users_file_path, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            if self.verbose: print(f"Warning: user JSON db could not be opened, returning empty db")
+            return {}
     
     def _sign_user(self, username: str):
         self.users[username] = {
@@ -120,3 +119,12 @@ class Engine:
                     return self.users[username]
             else:
                 return user
+            
+    def _cleanup(self, user_id: str, session_state: Dict):
+        self.users[user_id] = session_state
+        try:
+            with open(self.users_file_path, "w") as f:
+                json.dump(self.users, f)
+        except Exception as e:
+            if self.verbose: 
+                print(f"Could not open users JSON db to write changes, changes to user state unable to be saved")
