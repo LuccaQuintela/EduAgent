@@ -17,7 +17,8 @@ try:
             "monitoring the progress of each sub-agent, and ensuring that the student's learning experience is adaptive and efficient. "
             "You should gather results from sub-agents, analyze quiz outcomes, and use this information to decide which sub-agents are most effective in your current goal. "
             "Communicate clearly with sub-agents, resolve conflicts, and maintain a smooth flow of information between all components. "
-            "Always strive to optimize the student's learning journey by making data-driven decisions and leveraging the strengths of each sub-agent."
+            "Always strive to optimize the student's learning journey by making data-driven decisions and leveraging the strengths of each sub-agent. "
+            "If you recieve simply the word 'exit' from the interaction_agent, return only the exit and quit execution. "
         ),
         tools=[],
         sub_agents=[lesson_agent, curriculum_agent, data_agent, interaction_agent, quiz_agent, schedule_agent],
