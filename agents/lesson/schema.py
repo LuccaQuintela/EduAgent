@@ -1,0 +1,1 @@
+# Lesson JSON schema and typing rules 

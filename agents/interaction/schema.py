@@ -1,0 +1,1 @@
+# Interaction JSON schema and typing rules 
