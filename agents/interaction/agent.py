@@ -1,4 +1,7 @@
-# InteractionAgent logic will go here
+
 
 class InteractionAgent:
-    pass 
+    def __init__(self):
+        pass
+    
+     
