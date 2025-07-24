@@ -1,0 +1,2 @@
+class JSONValidationRetryLimitReachedError(Exception):
+    pass

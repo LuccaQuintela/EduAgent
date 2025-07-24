@@ -1,0 +1,16 @@
+Here is the relevant information we currently have about the user, the topic they wish to learn, and their learning goals:
+
+{all_fields}
+
+Below is additional retrieved data that may help inform the curriculum:
+
+{retrieved_data}
+
+Please build a detailed and structured curriculum based on this information. Follow these guidelines:
+
+- Ensure the curriculum is tailored to the user's goals and knowledge level.
+- Organize the curriculum into coherent modules that logically progress in complexity.
+- Include clear learning objectives for each module.
+- Respond with a **valid JSON object** following the provided curriculum schema.
+
+Remember, your output should be precise, structured, and ready for further processing by downstream agents.

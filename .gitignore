@@ -65,8 +65,5 @@ Desktop.ini
 # GitIngest data
 gitingest/
 
-# UV
-*.lock
-
 # Personal .ipynb testing files
 temp.ipynb

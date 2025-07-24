@@ -1,0 +1,21 @@
+Here is the relevant information we currently have about the user, the learning topic, and the specific module to generate a lesson for:
+
+USER PROVIDED INFORMATION:
+{all_fields}
+
+MODULE INFORMATION:
+{module_information}
+
+Below is additional retrieved data that may help inform the lesson content:
+
+{retrieved_data}
+
+Please build a detailed and structured lesson based on this information. Follow these guidelines:
+
+- Ensure the lesson aligns with the user’s goals and understanding level.
+- Structure the lesson using clearly titled content sections with well-written explanations.
+- Include specific learning objectives that the user should achieve after completing the lesson.
+- Add practice exercises that reinforce key ideas, with suggested answers.
+- Respond with a **valid JSON object** following the provided lesson schema.
+
+Remember, your output should be precise, pedagogically sound, and ready for use by downstream agents in the tutoring system.
