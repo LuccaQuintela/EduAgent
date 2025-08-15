@@ -51,7 +51,15 @@ class LessonAgentWorkflow(ResultBuilderAgentWorkflow):
         Learning Obectives - {module.learning_objectives}
         """.strip()
 
-        rag_string = self.create_rag_prompt(state)
+        # TODO: modify the query string to include curriculum info for this specific lesson
+        topic = state.get("topic")
+        goals = state.get("goals") 
+        rag_query = f"{topic or ""}, {goals or ""}"
+        rag_string = self.run_rag_system(
+            query=rag_query,
+            limit=10,
+            alpha=0.9,
+        )
         
         return super()._generate_templated_prompt(
             state=state, 

@@ -46,7 +46,15 @@ class CurriculumAgentWorkflow(ResultBuilderAgentWorkflow):
         ]
 
         path = BUILDING_PROMPT_TEMPLATE_PATH
-        rag_string = self.create_rag_prompt(state)
+        
+        topic = state.get("topic")
+        goals = state.get("goals") 
+        rag_query = f"{topic or ""}, {goals or ""}"
+        rag_string = self.run_rag_system(
+            query=rag_query,
+            limit=10,
+            alpha=0.9,
+        )
         
         return super()._generate_templated_prompt(
             state=state, 
@@ -68,5 +76,3 @@ class CurriculumAgentWorkflow(ResultBuilderAgentWorkflow):
             blackboard_update["curriculum"] = self.validated
             self.validated = None
         return blackboard_update
-
-        

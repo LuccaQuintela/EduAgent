@@ -138,8 +138,14 @@ class WeaviateVectorDatabase(VectorStore):
         return results
     
     def clear_all_collections(self):
-        for collection in self.collections.values:
-            collection.data.delete_many()
+        for collection in self.collections:
+            self.client.collections.get(collection).data.delete_many(
+                where={
+                    "path": ["id"],
+                    "operator": "IsNotNull",
+                    "valueText": ""
+                }
+            )
 
     def delete_all_collections(self):
         for collection in self.collections:

@@ -28,6 +28,7 @@ class EduAgentWorkflowBuilder:
         
         self.checkpointer = checkpointer
         self.store = store
+        self.verbose = verbose
         
 
     def build_graph(self):

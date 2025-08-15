@@ -1,7 +1,9 @@
-from typing import Optional, Tuple
+from typing import List, Optional, Tuple
 from pydantic import BaseModel
 from agents.agent import Agent
 from custom_types import BlackBoard
+from rag.factory import VectorDatabaseFactory
+from rag.vectorstore import SearchResult
 from utils.json_utils import strip_json_code_fence, validate_json
 from langchain_core.messages import AnyMessage
 from custom_errors import JSONValidationRetryLimitReachedError
@@ -23,11 +25,20 @@ class AgentWorkFlow:
         self.verbose = verbose
         self.try_limit = try_limit
 
-    def run_rag_system(self, state: BlackBoard) -> str:
-        return ""
-
-    def create_rag_prompt(self, state: BlackBoard) -> str:
-        return f"RETRIEVED DATA: \n{self.run_rag_system(state=state)}"
+    def create_rag_prompt(self, results:List[SearchResult]) -> str:
+        parts = []
+        parts.append("Provided below is a sample of relevant chunks of information to help you answer your prompt. Ground yourself in this information")
+        for result in results:
+            part = "\n".join(
+                [
+                    f"Chunk Relevancy Rank: {result.rank},",
+                    f"Chunk Similarity Score: {result.similarity_score},",
+                    f"Source Document: {result.chunk.metadata.document_title} - {result.chunk.metadata.document_metadata.source}",
+                    f"\n{result.chunk.content}\n",
+                ]
+            )
+            parts.append(part)
+        return "\n".join(parts)
     
     def _format_field(self, key: str, state: BlackBoard):
             default = "not yet provided"
@@ -69,7 +80,6 @@ class AgentWorkFlow:
 
         except Exception as e:
             raise RuntimeError(f"Unexpected error while generating prompt: {e}") from e
-    
 
 class ResultBuilderAgentWorkflow(AgentWorkFlow):
     def __init__(self, 
@@ -85,6 +95,7 @@ class ResultBuilderAgentWorkflow(AgentWorkFlow):
             verbose=verbose
         )
         self.validated = None
+        self.rag_system = VectorDatabaseFactory.build_local_weaviate_db()
         if schema:
             self.validation_schema = schema
         else:
@@ -120,3 +131,11 @@ class ResultBuilderAgentWorkflow(AgentWorkFlow):
     
     def _extract_json_from_message(self, message: AnyMessage) -> str:
         return strip_json_code_fence(message.content)
+    
+    def run_rag_system(self, query:str, limit:int = 5, **kwargs) -> str:
+        results = self.rag_system.hybrid_search(
+            query=query,
+            limit = limit,
+            **kwargs
+        )
+        return self.create_rag_prompt(results)
