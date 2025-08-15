@@ -1,0 +1,7 @@
+version: '3.8'
+
+services:
+  eduagent-weaviate:
+    extends:
+      file: docker-compose.rag.yml
+      service: eduagent-weaviate

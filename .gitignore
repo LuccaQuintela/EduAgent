@@ -67,3 +67,7 @@ gitingest/
 
 # Personal .ipynb testing files
 temp.ipynb
+
+# Weaviate Vector Data
+data/weaviate/
+docker/data/
