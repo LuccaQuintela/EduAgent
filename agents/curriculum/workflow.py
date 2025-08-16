@@ -35,9 +35,11 @@ class CurriculumAgentWorkflow(ResultBuilderAgentWorkflow):
     def is_json_valid(self, state: BlackBoard) -> bool:
         return super().is_json_valid(state=state, key="curriculum")
     
-    def _generate_templated_prompt(self, 
-                                  state: BlackBoard,
-                                  retry: bool = False) -> str:        
+    def _generate_templated_prompt(
+            self, 
+            state: BlackBoard,
+            retry: bool = False
+    ) -> str:        
         relevant_fields = [
             "topic",
             "current_experience",
